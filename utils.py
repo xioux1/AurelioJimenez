@@ -103,8 +103,8 @@ def unify_nan_strategy(df: pd.DataFrame) -> pd.DataFrame:
 def clean_features(X: pd.DataFrame,
                    X_test: pd.DataFrame,
                    *,
-                   low_var_thresh: int = 1,
-                   corr_thresh: float = 0.99,
+                   low_var_thresh: int = 0.01,
+                   corr_thresh: float = 0.95,
                    verbose: bool = True):
     """Drop near-constant and highly correlated columns.
 
