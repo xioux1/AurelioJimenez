@@ -21,7 +21,6 @@ from utils import (
 
 # --- columnas que quiero ignorar en TODO el pipeline ---
 COL_BLACKLIST = {
-    'legs0_segments1_duration',
 }
 
 initial_core_columns = [
@@ -53,7 +52,7 @@ initial_core_columns = [c for c in initial_core_columns if c not in COL_BLACKLIS
 initial_core_columns_test = [c for c in initial_core_columns if c != 'selected']
 
 
-def load_data(sample_frac=0.5, random_seed=42):
+def load_data(sample_frac=0.3, random_seed=42):
     print("Loading a subset of columns for train_df...")
     train_df = pd.read_parquet('/kaggle/input/aeroclub-recsys-2025/train.parquet', columns=initial_core_columns)
     log_mem_usage(train_df, "train_df loaded")
@@ -124,14 +123,6 @@ def prepare_matrices(train_df_processed, test_df_processed):
     ]
     id_cols_and_target = ['Id', 'ranker_id', 'selected', 'profileId', 'companyID', 'searchRoute']
     DROP_COLS = [
-        'free_cancel', 'free_exchange',
-        'ff_SU', 'ff_S7', 'ff_U6', 'ff_TK',
-        'has_fees', 'has_baggage',
-        'price_rank', 'totalPrice_rank_in_group', 'price_from_median',
-        'tax_percentage',
-        'n_segments_leg0', 'n_segments_leg1',
-        'group_size_log', 'has_access_tp',
-        'is_round_trip',
     ]
     train_df_processed.drop(
         columns=[c for c in DROP_COLS if c in train_df_processed.columns],
