@@ -52,7 +52,7 @@ initial_core_columns = [c for c in initial_core_columns if c not in COL_BLACKLIS
 initial_core_columns_test = [c for c in initial_core_columns if c != 'selected']
 
 
-def load_data(sample_frac=0.3, random_seed=42):
+def load_data(sample_frac=0.1, random_seed=42):
     print("Loading a subset of columns for train_df...")
     train_df = pd.read_parquet('/kaggle/input/aeroclub-recsys-2025/train.parquet', columns=initial_core_columns)
     log_mem_usage(train_df, "train_df loaded")
