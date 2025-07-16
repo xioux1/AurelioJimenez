@@ -2,6 +2,9 @@ import pandas as pd
 import numpy as np
 
 import utils
+import features
+import metrics
+import memory
 
 
 def test_unify_nan_strategy_flags_and_nan_preservation():
@@ -42,7 +45,7 @@ def test_create_remaining_features_leaves_nan_for_minus1_cols():
             "taxes": [10.0],
         }
     )
-    out = utils.create_remaining_features(df.copy(), is_train=True)
+    out = features.create_remaining_features(df.copy(), is_train=True)
     assert pd.isna(out.loc[0, "booking_lead_days"])
 
     out2 = utils.unify_nan_strategy(out.copy())
@@ -59,7 +62,7 @@ def test_clean_features_drops_low_var_and_corr():
     })
     X_test = X.copy()
 
-    X_clean, X_test_clean, dropped = utils.clean_features(
+    X_clean, X_test_clean, dropped = features.clean_features(
         X, X_test, verbose=False
     )
 
@@ -86,7 +89,7 @@ def test_calculate_hit_rate_at_3():
     })
     df = pd.concat([group_a, group_b], ignore_index=True)
 
-    hr = utils.calculate_hit_rate_at_3(df)
+    hr = metrics.calculate_hit_rate_at_3(df)
     assert hr == 0.5
 
 
@@ -108,13 +111,13 @@ def test_smart_fill_numeric_fills_and_downcasts():
 
 def test_log_mem_usage_outputs(capsys):
     df = pd.DataFrame({"a": [1, 2, 3]})
-    utils.log_mem_usage(df, "dummy")
+    memory.log_mem_usage(df, "dummy")
     captured = capsys.readouterr()
     assert "dummy" in captured.out
 
 
 def test_create_initial_datetime_features_normalises_offsets():
     df = pd.DataFrame({"legs0_departureAt": ["2024-08-21T16:00:00 UTC+5"]})
-    out = utils.create_initial_datetime_features(df.copy())
+    out = features.create_initial_datetime_features(df.copy())
     ts = out.loc[0, "legs0_departureAt"]
     assert ts.utcoffset().total_seconds() == 5 * 3600

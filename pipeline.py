@@ -5,19 +5,19 @@ from sklearn.model_selection import GroupKFold
 from sklearn.preprocessing import LabelEncoder
 import gc
 
-from utils import (
+from features import (
     create_initial_datetime_features,
     create_remaining_features,
     create_features,
-    unify_nan_strategy,
-    reduce_mem_usage,
-    log_mem_usage,
     clean_features,
-    calculate_hit_rate_at_3,
-    lgb_hit_rate_at_3,
+)
+from utils import (
+    unify_nan_strategy,
     smart_fill_numeric,
     frequency_encode,
 )
+from memory import reduce_mem_usage, log_mem_usage
+from metrics import calculate_hit_rate_at_3, lgb_hit_rate_at_3
 
 # --- columnas que quiero ignorar en TODO el pipeline ---
 COL_BLACKLIST = {
