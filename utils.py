@@ -401,7 +401,7 @@ def create_features(df):
     df = pd.concat([df, pd.DataFrame(feat, index=df.index)], axis=1)
     df = df.loc[:, ~df.columns.duplicated(keep="first")]
     for col in df.select_dtypes(include="object").columns:
-        if pd.api.types.is_categorical_dtype(df[col]):
+        if isinstance(df[col].dtype, pd.CategoricalDtype):
             if "missing" not in df[col].cat.categories:
                 df[col] = df[col].cat.add_categories(["missing"])
             df[col] = df[col].fillna("missing")
