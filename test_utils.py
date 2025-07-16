@@ -121,3 +121,10 @@ def test_create_initial_datetime_features_normalises_offsets():
     out = features.create_initial_datetime_features(df.copy())
     ts = out.loc[0, "legs0_departureAt"]
     assert ts.utcoffset().total_seconds() == 5 * 3600
+
+
+def test_reduce_mem_usage_wrapper():
+    df = pd.DataFrame({"a": np.arange(10, dtype=np.int64)})
+    out = utils.reduce_mem_usage(df.copy(), verbose=False)
+    assert out["a"].tolist() == df["a"].tolist()
+    assert out["a"].dtype == np.int8

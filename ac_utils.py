@@ -195,3 +195,15 @@ def create_remaining_features(*args, **kwargs):
     from features import create_remaining_features as _crmf
     return _crmf(*args, **kwargs)
 
+
+def reduce_mem_usage(*args, **kwargs):
+    """Compatibility wrapper for :func:`memory.reduce_mem_usage`."""
+    from memory import reduce_mem_usage as _rm
+    return _rm(*args, **kwargs)
+
+
+def log_mem_usage(*args, **kwargs):
+    """Compatibility wrapper for :func:`memory.log_mem_usage`."""
+    from memory import log_mem_usage as _lm
+    return _lm(*args, **kwargs)
+
