@@ -55,21 +55,21 @@ initial_core_columns_test = [c for c in initial_core_columns if c != 'selected']
 def load_data(sample_frac=0.1, random_seed=42):
     print("Loading a subset of columns for train_df...")
     train_df = pd.read_parquet('/kaggle/input/aeroclub-recsys-2025/train.parquet', columns=initial_core_columns)
-    log_mem_usage(train_df, "train_df loaded")
+    log_mem_usage(train_df, "train_df loaded", summary=True)
 
     unique_ids = train_df['ranker_id'].unique()
     n_keep = int(len(unique_ids) * sample_frac)
     rng = np.random.RandomState(random_seed)
     sampled_rankers = rng.choice(unique_ids, size=n_keep, replace=False)
     train_df = train_df[train_df['ranker_id'].isin(sampled_rankers)].reset_index(drop=True)
-    log_mem_usage(train_df, "train_df sampled")
+    log_mem_usage(train_df, "train_df sampled", summary=True)
     print(f"Train reducido (grupos completos): {train_df.shape}")
     bad_groups = train_df.groupby('ranker_id').size().lt(11).sum()
     print(f"Grupos con <11 filas: {bad_groups}")
 
     print("Loading a subset of columns for test_df...")
     test_df = pd.read_parquet('/kaggle/input/aeroclub-recsys-2025/test.parquet', columns=initial_core_columns_test)
-    log_mem_usage(test_df, "test_df loaded")
+    log_mem_usage(test_df, "test_df loaded", summary=True)
     sample_submission_df = pd.read_parquet('/kaggle/input/aeroclub-recsys-2025/sample_submission.parquet')
 
     if 'Id' in test_df.columns and 'ranker_id' in test_df.columns:
@@ -84,7 +84,7 @@ def load_data(sample_frac=0.1, random_seed=42):
 
 def preprocess_dataframe(df, is_train=True):
     df = create_initial_datetime_features(df)
-    log_mem_usage(df, f"{'train' if is_train else 'test'} after datetime")
+    log_mem_usage(df, f"{'train' if is_train else 'test'} after datetime", summary=True)
     obj_cols = df.select_dtypes('object').columns
     for c in obj_cols:
         df[c] = df[c].astype('category')
@@ -98,13 +98,13 @@ def preprocess_dataframe(df, is_train=True):
             binary_cols.append(c)
     df = smart_fill_numeric(df, zero_cols=binary_cols)
     df = reduce_mem_usage(df)
-    log_mem_usage(df, f"{'train' if is_train else 'test'} after first reduce")
+    log_mem_usage(df, f"{'train' if is_train else 'test'} after first reduce", summary=True)
     df = create_features(df)
     df = create_remaining_features(df, is_train=is_train)
     df = unify_nan_strategy(df)
-    log_mem_usage(df, f"{'train' if is_train else 'test'} after unify")
+    log_mem_usage(df, f"{'train' if is_train else 'test'} after unify", summary=True)
     df = reduce_mem_usage(df)
-    log_mem_usage(df, f"{'train' if is_train else 'test'} final")
+    log_mem_usage(df, f"{'train' if is_train else 'test'} final", summary=True)
     return df
 
 def prepare_matrices(train_df_processed, test_df_processed):
