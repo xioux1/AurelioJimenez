@@ -88,7 +88,7 @@ def preprocess_dataframe(df, is_train=True):
     obj_cols = df.select_dtypes('object').columns
     for c in obj_cols:
         df[c] = df[c].astype('category')
-    if 'frequentFlyer' in df.columns and pd.api.types.is_categorical_dtype(df['frequentFlyer']):
+    if 'frequentFlyer' in df.columns and isinstance(df['frequentFlyer'].dtype, pd.CategoricalDtype):
         df['frequentFlyer'] = df['frequentFlyer'].cat.add_categories(['']).fillna('')
     binary_candidates = df.select_dtypes(include=['number', 'bool']).columns
     binary_cols = []
