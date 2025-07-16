@@ -19,35 +19,12 @@ from utils import (
     frequency_encode,
 )
 
-# --- columnas que quiero ignorar en TODO el pipeline ---
-COL_BLACKLIST = {
-}
+from config import INITIAL_CORE_COLUMNS, EXTRA_COLS, COL_BLACKLIST
 
-initial_core_columns = [
-    'Id', 'ranker_id', 'selected', 'profileId', 'companyID',
-    'requestDate', 'totalPrice', 'taxes',
-    'legs0_departureAt', 'legs0_arrivalAt', 'legs0_duration',
-    'legs1_departureAt', 'legs1_arrivalAt', 'legs1_duration',
-    'legs0_segments0_departureFrom_airport_iata', 'legs0_segments0_arrivalTo_airport_iata',
-    'legs0_segments0_marketingCarrier_code', 'legs0_segments0_cabinClass',
-    'legs0_segments0_baggageAllowance_quantity',
-    'searchRoute',
-    'pricingInfo_isAccessTP', 'pricingInfo_passengerCount',
-    'sex', 'nationality', 'isVip',
-    'miniRules0_monetaryAmount', 'miniRules0_percentage',
-    'miniRules1_monetaryAmount', 'miniRules1_percentage'
+# Start from the configured base column lists and apply optional adjustments
+initial_core_columns = INITIAL_CORE_COLUMNS + [
+    c for c in EXTRA_COLS if c not in INITIAL_CORE_COLUMNS
 ]
-
-extra_cols = [
-    'frequentFlyer', 'corporateTariffCode',
-    'legs1_segments0_baggageAllowance_quantity',
-    'legs1_segments0_cabinClass',
-    'legs1_segments0_departureFrom_airport_iata',
-    'legs1_segments0_arrivalTo_airport_iata',
-    'legs1_segments0_marketingCarrier_code',
-]
-
-initial_core_columns += [c for c in extra_cols if c not in initial_core_columns]
 initial_core_columns = [c for c in initial_core_columns if c not in COL_BLACKLIST]
 initial_core_columns_test = [c for c in initial_core_columns if c != 'selected']
 
