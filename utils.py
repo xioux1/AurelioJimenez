@@ -173,7 +173,13 @@ def reduce_mem_usage(df, verbose=True):
         print(f"Mem. usage decreased to {end_mem:5.2f} Mb ({100 * (start_mem - end_mem) / start_mem:.1f}% reduction)")
     return df
 
-def log_mem_usage(df: pd.DataFrame, label: str = "") -> None:
+def log_mem_usage(
+    df: pd.DataFrame,
+    label: str = "",
+    *,
+    summary: bool = False,
+    top_n: int = 5,
+) -> None:
     """Print memory usage information for ``df``.
 
     Parameters
@@ -185,10 +191,16 @@ def log_mem_usage(df: pd.DataFrame, label: str = "") -> None:
     """
 
     tag = f"[{label}] " if label else ""
-    usage = df.memory_usage(deep=True)
+    usage = df.memory_usage(deep=True).sort_values(ascending=False)
     total_mb = usage.sum() / 1024 ** 2
     print(f"{tag}Memory usage (deep):")
-    print(usage.to_string())
+    if summary:
+        head = usage.head(top_n)
+        print(head.to_string())
+        if len(usage) > top_n:
+            print(f"... (showing top {top_n} of {len(usage)} columns)")
+    else:
+        print(usage.to_string())
     print(f"{tag}Total: {total_mb:.2f} MB")
 
 def frequency_encode(train_series: pd.Series,
