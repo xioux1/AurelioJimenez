@@ -52,12 +52,14 @@ initial_core_columns = [c for c in initial_core_columns if c not in COL_BLACKLIS
 initial_core_columns_test = [c for c in initial_core_columns if c != 'selected']
 
 
-def load_data(sample_frac=0.1, random_seed=42):
+def load_data(sample_frac, random_seed=42):
     print("Loading a subset of columns for train_df...")
     train_df = pd.read_parquet('/kaggle/input/aeroclub-recsys-2025/train.parquet', columns=initial_core_columns)
     log_mem_usage(train_df, "train_df loaded", summary=True)
 
     unique_ids = train_df['ranker_id'].unique()
+    if sample_frac is None:
+        raise ValueError("sample_frac must be provided by the caller")
     n_keep = int(len(unique_ids) * sample_frac)
     rng = np.random.RandomState(random_seed)
     sampled_rankers = rng.choice(unique_ids, size=n_keep, replace=False)
@@ -212,7 +214,7 @@ def encode_categoricals(
 
     return X, X_test, categorical_features_for_encoding
 
-def train_model(X, y, X_test, ranker_ids, cat_features, params=None, n_folds=5):
+def train_model(X, y, X_test, ranker_ids, cat_features, *, params, n_folds=5):
     """Train a LightGBM ranker.
 
     Parameters
@@ -233,27 +235,7 @@ def train_model(X, y, X_test, ranker_ids, cat_features, params=None, n_folds=5):
         Number of cross-validation folds.
     """
     if params is None:
-        params = {
-        'objective': 'lambdarank',
-        'metric': 'None',
-        'boosting_type': 'gbdt',
-        'n_estimators': 8000,
-        'learning_rate': 0.03,
-        'num_leaves': 63,
-        'max_depth': 8,
-        'min_child_samples': 25,
-        'subsample': 0.8,
-        'colsample_bytree': 0.8,
-        'max_bin': 31,
-        'lambda_l1':1.0,
-        'lambda_l2':1.0,
-        'min_gain_to_split': 0.1,
-        'random_state': 42,
-        'n_jobs': -1,
-        'importance_type': 'gain',
-        'verbose': -1,
-        'seed': 42
-        }
+        raise ValueError("model parameters must be provided by the caller")
     group_kfold = GroupKFold(n_splits=n_folds)
     oof_preds_scores = np.zeros(len(X))
     test_preds_scores = np.zeros(len(X_test))
@@ -307,8 +289,15 @@ def train_model(X, y, X_test, ranker_ids, cat_features, params=None, n_folds=5):
 
     return test_preds_scores, feature_importances
 
-def main():
-    train_df, test_df, sample_submission_df, test_ids_df = load_data()
+def main(*, sample_frac, model_params, n_folds=5, low_var_thresh, corr_thresh=0.95):
+    """Run the full training pipeline.
+
+    All key parameters must be supplied by the caller so that the
+    accompanying notebook is the single source of truth for these
+    settings.
+    """
+
+    train_df, test_df, sample_submission_df, test_ids_df = load_data(sample_frac)
     train_df_processed = preprocess_dataframe(train_df, is_train=True)
     gc.collect()
     test_df_processed = preprocess_dataframe(test_df, is_train=False)
@@ -330,10 +319,13 @@ def main():
 
     X, X_test, cat_features = encode_categoricals(X, X_test)
     gc.collect()
-    # Use the same low_var_thresh across all scripts
-    X, X_test, _ = clean_features(X, X_test, low_var_thresh=1)
+    X, X_test, _ = clean_features(
+        X, X_test, low_var_thresh=low_var_thresh, corr_thresh=corr_thresh
+    )
     gc.collect()
-    preds, _ = train_model(X, y, X_test, ranker_ids, cat_features)
+    preds, _ = train_model(
+        X, y, X_test, ranker_ids, cat_features, params=model_params, n_folds=n_folds
+    )
     submission_df = test_ids_df.copy()
     submission_df['score'] = preds
     submission_df['selected'] = submission_df.groupby('ranker_id')['score'].rank(method='first', ascending=False).astype(int)
@@ -344,4 +336,4 @@ def main():
     return submission_df
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit("This script is intended to be run via the notebook")
