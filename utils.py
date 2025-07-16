@@ -171,3 +171,27 @@ def readme() -> str:
         "training pipeline (see :mod:`pipeline`)."
     )
 
+
+def clean_features(*args, **kwargs):
+    """Compatibility wrapper for :func:`features.clean_features`."""
+    from features import clean_features as _cf
+    return _cf(*args, **kwargs)
+
+
+def create_features(*args, **kwargs):
+    """Compatibility wrapper for :func:`features.create_features`."""
+    from features import create_features as _crf
+    return _crf(*args, **kwargs)
+
+
+def create_initial_datetime_features(*args, **kwargs):
+    """Compatibility wrapper for :func:`features.create_initial_datetime_features`."""
+    from features import create_initial_datetime_features as _cidf
+    return _cidf(*args, **kwargs)
+
+
+def create_remaining_features(*args, **kwargs):
+    """Compatibility wrapper for :func:`features.create_remaining_features`."""
+    from features import create_remaining_features as _crmf
+    return _crmf(*args, **kwargs)
+
