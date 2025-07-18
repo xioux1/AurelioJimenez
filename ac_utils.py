@@ -146,17 +146,6 @@ def dur_stats(df):
               "| min:", df[col].min(),
               "| max:", df[col].max())
 
-def check_rank_permutation(group):
-    N = len(group)
-    sorted_ranks = sorted(list(group['selected']))
-    expected_ranks = list(range(1, N + 1))
-    if sorted_ranks != expected_ranks:
-        print(f"Invalid rank permutation for ranker_id: {group['ranker_id'].iloc[0]}")
-        print(f"Expected: {expected_ranks}, Got: {sorted_ranks}")
-        return False
-    return True
-
-
 def readme() -> str:
     """Return a short description of this project's purpose.
 
