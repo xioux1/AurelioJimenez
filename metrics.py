@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 
 
 def calculate_hit_rate_at_3(df_preds_with_true_and_rank):

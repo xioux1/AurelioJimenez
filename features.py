@@ -242,7 +242,6 @@ def create_remaining_features(df: pd.DataFrame, is_train: bool = True) -> pd.Dat
     group_key = 'ranker_id'
     if group_key not in df.columns:
         return df
-    cols_for_group_features = []
     user_company_cats_loaded = [c for c in ['sex', 'nationality', 'isVip'] if c in df.columns]
     for col in user_company_cats_loaded:
         if df[col].dtype == 'bool':
